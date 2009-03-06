@@ -7,16 +7,24 @@ class Compiler(object):
     def emit(self, acc, bytecode, arg=None):
         acc.append(chr(bytecode))
         if arg is not None:
-            acc.append(chr(arg))
+            if isinstance(arg, list):
+                acc += arg
+            else:
+                acc.append(chr(arg))
 
+    def encode4(self, value):
+        return [chr(value & 0xFF),
+                chr((value >> 8) & 0xFF),
+                chr((value >> 16) & 0xFF),
+                chr((value >> 24) & 0xFF)]
     def compile_Loop(self, bytecode, ast, pos):
-        self.pc += 2
+        self.pc += 5
         start = self.pc
         res = self._compile(ast)
-        end = self.pc + 2
-        self.emit(bytecode, bytecodes.BF_JUMP_IF_ZERO, end)
+        end = self.pc + 5
+        self.emit(bytecode, bytecodes.BF_JUMP_IF_ZERO, self.encode4(end))
         bytecode += res
-        self.emit(bytecode, bytecodes.BF_JUMP_UNLESS_ZERO, start)
+        self.emit(bytecode, bytecodes.BF_JUMP_UNLESS_ZERO, self.encode4(start))
         
     def compile(self):
         return self._compile(self.ast)

@@ -9,6 +9,15 @@ class Interpreter(object):
     def decode(self, bytecode):
         return ord(bytecode)
         
+    def read4(self, code, pc):
+        highval = ord(code[pc+3])
+        if highval >= 128:
+            highval -= 256
+        return (ord(code[pc]) |
+                (ord(code[pc+1]) << 8) |
+                (ord(code[pc+2]) << 16) |
+                (highval << 24))
+
     def run(self):
         pc = 0
         memory = {0:0}
@@ -33,24 +42,23 @@ class Interpreter(object):
                     memory[dp] = 0
                 print chr(memory[dp])
             elif inst == bytecodes.BF_READ:
-                # TODO: read
                 inp = sys.stdin.read(1)
                 memory[dp] = ord(inp)
             elif inst == bytecodes.BF_JUMP_IF_ZERO:
                 if dp not in memory:
                     memory[dp] = 0
                 if memory[dp] == 0:
-                    arg = self.decode(self.bytecode[pc])
+                    arg = self.read4(self.bytecode, 4)
                     pc = arg
                 else:
                     # skip argument
-                    pc += 1
+                    pc += 4
             elif inst == bytecodes.BF_JUMP_UNLESS_ZERO:
                 if dp not in memory:
                     memory[dp] = 0
                 if memory[dp] != 0:
-                    arg = self.decode(self.bytecode[pc])
+                    arg = self.read4(self.bytecode, pc)
                     pc = arg
                 else:
-                    pc += 1
+                    pc += 4
         print memory
