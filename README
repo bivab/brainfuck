@@ -1,0 +1,5 @@
+Simple bytecode interpreter for the brainfuck language
+
+Testfiles from:
+http://esoteric.sange.fi/brainfuck/
+http://en.wikipedia.org/wiki/Brainfuck
