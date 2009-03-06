@@ -40,7 +40,10 @@ class Interpreter(object):
             elif inst == bytecodes.BF_ECHO:
                 if dp not in memory:
                     memory[dp] = 0
-                print chr(memory[dp])
+                if memory[dp] < 256:
+                    print chr(memory[dp])
+                else:
+                    print memory[dp]
             elif inst == bytecodes.BF_READ:
                 inp = sys.stdin.read(1)
                 memory[dp] = ord(inp)
