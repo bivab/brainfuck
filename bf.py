@@ -1,6 +1,6 @@
 from bfparser import Parser
 from bfcompiler import Compiler
-from decompiler import Decompiler
+from bfdecompiler import Decompiler
 from bfinterpreter import Interpreter
 
 import sys
