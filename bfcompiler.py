@@ -10,13 +10,15 @@ class Compiler(object):
             if isinstance(arg, list):
                 acc += arg
             else:
-                acc.append(chr(arg))
-
+                print "Error got somenthing that is not a list"
+            #   acc.append(chr(arg))
+            
     def encode4(self, value):
         return [chr(value & 0xFF),
                 chr((value >> 8) & 0xFF),
                 chr((value >> 16) & 0xFF),
                 chr((value >> 24) & 0xFF)]
+                
     def compile_Loop(self, bytecode, ast, pos):
         self.pc += 5
         start = self.pc
@@ -32,21 +34,21 @@ class Compiler(object):
     def _compile(self, ast):
         pos = 0
         bytecode = []
-        while(pos < len(ast)):
-            inst = ast[pos]
-            if inst == '>':
+        while(pos < len(ast.children)):
+            inst = ast.children[pos]
+            if inst.value == '>':
                 self.emit(bytecode, bytecodes.BF_INCR_DP)
-            elif inst == '<':
+            elif inst.value == '<':
                 self.emit(bytecode, bytecodes.BF_DCR_DP)
-            elif inst == '+':
+            elif inst.value == '+':
                 self.emit(bytecode, bytecodes.BF_INCR_D)
-            elif inst == '-':
+            elif inst.value == '-':
                 self.emit(bytecode, bytecodes.BF_DCR_D)
-            elif inst == '.':
+            elif inst.value == '.':
                 self.emit(bytecode, bytecodes.BF_ECHO)
-            elif inst == ',':
+            elif inst.value == ',':
                 self.emit(bytecode, bytecodes.BF_READ)
-            elif isinstance(inst, list):
+            elif inst.value is None and len(inst.children) > 0:
                 self.compile_Loop(bytecode, inst, pos)
             pos += 1
             self.pc += 1
