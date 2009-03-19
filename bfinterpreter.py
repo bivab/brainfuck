@@ -60,4 +60,4 @@ class Interpreter(object):
                     pc = arg
                 else:
                     pc += 4
-        print memory
+        #print memory

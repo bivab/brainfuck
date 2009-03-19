@@ -23,7 +23,7 @@ class Compiler(object):
         self.pc += 5
         start = self.pc
         res = self._compile(ast)
-        end = self.pc + 5
+        end = start + len(res) + 5
         self.emit(bytecode, bytecodes.BF_JUMP_IF_ZERO, self.encode4(end))
         bytecode += res
         self.emit(bytecode, bytecodes.BF_JUMP_UNLESS_ZERO, self.encode4(start))

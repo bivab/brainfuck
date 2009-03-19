@@ -2,14 +2,6 @@ class AstNode(object):
     def __init__(self, value = None):
         self.value = value
         self.children = []
-
-    def __repr__(self):
-        s = ''
-        if len(self.children) > 0:
-            s = repr(self.children)
-        if self.value is not None:
-            s = self.value + s
-        return s
     
     def __eq__(self, other):
         return (self.__class__ is other.__class__ and 
@@ -24,19 +16,12 @@ class Parser(object):
         self.ast  = AstNode()
         self.nest = 0
         
-    def parseLoop(self):
-        self.nest -= 1
-        t = []
-        c = self.ast.children.pop()
-        while(c.value != '['):
-            t.insert(0, c)
-            c = self.ast.children.pop()
-        self.ast.children = t
-        
     def parse(self):
         self.pos = 0
         self._parse(self.ast)
+        assert self.nest == 0, self.nest
     def _parse(self, node):
+        nesting = self.nest
         while(self.pos < len(self.code)):
             inst = self.code[self.pos]
             if inst == '>':
@@ -54,11 +39,14 @@ class Parser(object):
             elif inst == '[':
                 self.pos += 1
                 n = AstNode()
+                self.nest += 1
                 self._parse(n)
                 node.children.append(n)
             elif inst == ']':
-                self.pos += 1
-                return
+                # self.pos += 1
+                self.nest -= 1
+                nesting -= 1
+                break
             self.pos += 1
             
-        assert self.nest == 0, self.nest
+        assert self.nest == nesting, (self.nest, nesting)
