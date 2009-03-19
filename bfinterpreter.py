@@ -1,6 +1,6 @@
 import bytecodes
 
-import sys
+import os
 class Interpreter(object):
     def __init__(self, bytecode):
         #super(Interpreter, self).__init__()
@@ -42,9 +42,8 @@ class Interpreter(object):
                 else:
                     print memory[dp]
             elif inst == bytecodes.BF_READ:
-                # inp = sys.stdin.read(1)
-                # memory[dp] = ord(inp)
-                pass
+                inp = read()
+                memory[dp] = ord(inp)
             elif inst == bytecodes.BF_JUMP_IF_ZERO:
                 
                 if memory[dp] == 0:
@@ -61,3 +60,16 @@ class Interpreter(object):
                 else:
                     pc += 4
         #print memory
+def read():
+    result = None
+    while True:
+        s = os.read(0, 1)
+        if result is None:
+            result = s
+        if s == "\n":
+            break
+        if s == '':
+            if len(result) > 1:
+                break
+            raise SystemExit
+    return result
