@@ -5,10 +5,10 @@ class Interpreter(object):
     def __init__(self, bytecode):
         #super(Interpreter, self).__init__()
         self.bytecode = bytecode
-    
+
     def decode(self, bytecode):
         return ord(bytecode)
-        
+
     def read4(self, code, pc):
         highval = ord(code[pc+3])
         if highval >= 128:
@@ -30,13 +30,13 @@ class Interpreter(object):
             elif inst == bytecodes.BF_DCR_DP:
                 dp -= 1
             elif inst == bytecodes.BF_INCR_D:
-                
+
                 memory[dp] += 1
             elif inst == bytecodes.BF_DCR_D:
-                
+
                 memory[dp] -= 1
             elif inst == bytecodes.BF_ECHO:
-                
+
                 if memory[dp] < 256:
                     print chr(memory[dp])
                 else:
@@ -45,7 +45,7 @@ class Interpreter(object):
                 inp = read()
                 memory[dp] = ord(inp)
             elif inst == bytecodes.BF_JUMP_IF_ZERO:
-                
+
                 if memory[dp] == 0:
                     arg = self.read4(self.bytecode, 4)
                     pc = arg
@@ -53,7 +53,7 @@ class Interpreter(object):
                     # skip argument
                     pc += 4
             elif inst == bytecodes.BF_JUMP_UNLESS_ZERO:
-                
+
                 if memory[dp] != 0:
                     arg = self.read4(self.bytecode, pc)
                     pc = arg
@@ -72,4 +72,4 @@ def read():
             if len(result) > 1:
                 break
             raise SystemExit
-    return result
+    return result[0]
