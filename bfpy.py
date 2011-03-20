@@ -11,16 +11,16 @@ def run(code, debug=False):
     p.parse()
     c = Compiler(p.ast)
     b = c.compile()
-    
+
     if debug:
         print p.ast
         print b
         d = Decompiler(b)
         d.decompile()
-    
+
     i = Interpreter(b)
     i.run()
-    print 
+    print
 
 def entry_point(args):
     if len(args) == 1:
@@ -41,6 +41,14 @@ def entry_point(args):
 
         run(code, debug)
         return 0
-    
+
 def target(driver, args):
     return entry_point, None
+
+def jitpolicy(self):
+    from pypy.jit.codewriter.policy import JitPolicy
+    return JitPolicy()
+
+def portal(driver):
+    from prolog.interpreter.portal import get_portal
+    return get_portal(driver)

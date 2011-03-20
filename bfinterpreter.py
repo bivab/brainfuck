@@ -1,7 +1,13 @@
+from pypy.rlib import jit
 import bytecodes
 
 import os
+jitdriver = jit.JitDriver(
+        greens=["pc", "bytecode"],
+        reds=['dp', 'memory', 'self'])
+
 class Interpreter(object):
+    _immutable_fields_ = ['bytecode']
     def __init__(self, bytecode):
         #super(Interpreter, self).__init__()
         self.bytecode = bytecode
@@ -22,8 +28,11 @@ class Interpreter(object):
         pc = 0
         memory = [0 for x in xrange(300)]
         dp = 0
-        while(pc < len(self.bytecode)):
-            inst = self.decode(self.bytecode[pc])
+        bytecode = self.bytecode
+        while(pc < len(bytecode)):
+            jitdriver.jit_merge_point(pc=pc, bytecode=bytecode, dp=dp,
+            memory=memory, self=self)
+            inst = self.decode(bytecode[pc])
             pc += 1
             if inst == bytecodes.BF_INCR_DP:
                 dp += 1
@@ -47,7 +56,10 @@ class Interpreter(object):
             elif inst == bytecodes.BF_JUMP_IF_ZERO:
 
                 if memory[dp] == 0:
-                    arg = self.read4(self.bytecode, 4)
+                    arg = self.read4(bytecode, 4)
+                    if arg < pc:
+                        jitdriver.can_enter_jit(pc=arg, bytecode=bytecode,
+                        dp=dp, memory=memory, self=self)
                     pc = arg
                 else:
                     # skip argument
@@ -55,7 +67,10 @@ class Interpreter(object):
             elif inst == bytecodes.BF_JUMP_UNLESS_ZERO:
 
                 if memory[dp] != 0:
-                    arg = self.read4(self.bytecode, pc)
+                    arg = self.read4(bytecode, pc)
+                    if arg < pc:
+                        jitdriver.can_enter_jit(pc=arg, bytecode=bytecode,
+                        dp=dp, memory=memory, self=self)
                     pc = arg
                 else:
                     pc += 4
